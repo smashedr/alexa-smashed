@@ -13,7 +13,7 @@ class Twitch(object):
         self.user_id = user_id
         self.client_id = os.environ.get('client_id')
         self.base_url = 'https://api.twitch.tv/helix'
-        self.headers = {'Client-ID': os.environ.get('client_id')}
+        self.headers = {'Client-ID': self.client_id}
         self.channel = {}
         self.stream = {}
         self.user = {}
