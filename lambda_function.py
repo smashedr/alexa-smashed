@@ -66,7 +66,6 @@ def check_live():
     logger.info('stream: {}'.format(stream))
     if stream:
         uptime = convert_time(get_uptime(stream))
-        logger.info('uptime:type: {}'.format(type(uptime)))
         speech = 'Yes, {} has been streaming for {}.'.format(
             PHONETIC, uptime
         )
