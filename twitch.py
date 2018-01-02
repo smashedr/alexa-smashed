@@ -61,9 +61,7 @@ class Twitch(object):
             url = '{}/users/follows'.format(self.base_url)
             r = requests.get(url, params=params, headers=self.headers)
             d = r.json()
-            logger.info(d)
             self.followers = d
-            logger.info(self.followers)
 
     def _get_user(self):
         if not self.user:
