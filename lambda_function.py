@@ -1,78 +1,75 @@
+from datetime import datetime
 import os
 import logging
 import requests
+from alexa import alexa_resp
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+USER_ID = '22193985'
 CHANNEL = 'smashed926'
 PHONETIC = 'smashed nine two six'
 HEADERS = {
     'Client-ID': os.environ.get('client_id'),
-    'Accept': 'application/vnd.twitchtv.v5+json',
 }
 
 
-def build_speech_response(title, output, reprompt_text, should_end_session):
-    return {
-        'outputSpeech': {
-            'type': 'PlainText',
-            'text': output
-        },
-        'card': {
-            'type': 'Simple',
-            'title': "SessionSpeechlet - " + title,
-            'content': "SessionSpeechlet - " + output
-        },
-        'reprompt': {
-            'outputSpeech': {
-                'type': 'PlainText',
-                'text': reprompt_text
-            }
-        },
-        'shouldEndSession': should_end_session
-    }
-
-
-def build_alexa_response(session_attributes, speech_response):
-    return {
-        'version': '1.0',
-        'sessionAttributes': session_attributes,
-        'response': speech_response
-    }
-
-
-def alexa_resp(speech, title, reprompt=None, session_end=True):
-    alexa = build_alexa_response(
-        {}, build_speech_response(title, speech, reprompt, session_end)
-    )
-    return alexa
-
-
 def get_user():
-    url = 'https://api.twitch.tv/kraken/users?login={}'.format(CHANNEL)
-    r = requests.get(url, headers=HEADERS)
+    params = {'id': USER_ID}
+    url = 'https://api.twitch.tv/helix/users'
+    r = requests.get(url, params=params, headers=HEADERS)
     d = r.json()
-    for user in d['users']:
-        if user['name'].lower() == CHANNEL:
-            return user
-    raise ValueError('Unable to locate user.')
+    return d['data'][0] if d['data'] else None
 
 
-def get_stream(channel_id):
-    url = 'https://api.twitch.tv/kraken/streams/{}'.format(channel_id)
-    r = requests.get(url, headers=HEADERS)
-    return r.json()
+def get_stream():
+    params = {'user_id': USER_ID}
+    url = 'https://api.twitch.tv/helix/streams'
+    r = requests.get(url, params=params, headers=HEADERS)
+    d = r.json()
+    return d['data'][0] if d['data'] else None
 
 
-def check_live(event):
+def convert_time(seconds):
+    try:
+        m, s = divmod(seconds, 60)
+        h, m = divmod(m, 60)
+        if h < 1:
+            ms = 's' if m > 1 else ''
+            o = '{} minute{}'.format(m, ms)
+        else:
+            hs = 's' if h > 1 else ''
+            ms = 's' if m > 1 else ''
+            o = '{} hour{} and {} minute{}'.format(h, hs, m, ms)
+        return o
+    except Exception as error:
+        logger.exception(error)
+        return None
+
+
+def get_uptime(stream=None):
+    if not stream:
+        stream = get_stream()
+    if stream:
+        stream_created_at = stream['started_at']
+        stream_created_date = datetime.strptime(stream_created_at, '%Y-%m-%dT%H:%M:%SZ')
+        stream_uptime = datetime.utcnow() - stream_created_date
+        return stream_uptime.seconds
+    else:
+        return None
+
+
+def check_live():
     logger.info('Streaming')
-    user = get_user()
-    logger.info('user: {}'.format(user))
-    stream = get_stream(user['_id'])
+    stream = get_stream()
     logger.info('stream: {}'.format(stream))
-    if stream['stream']:
-        speech = 'Yes, {} is streaming right now.'.format(PHONETIC)
+    if stream:
+        uptime = convert_time(get_uptime(stream))
+        logger.info('uptime:type: {}'.format(type(uptime)))
+        speech = 'Yes, {} has been streaming for {}.'.format(
+            PHONETIC, uptime
+        )
         return alexa_resp(speech, 'Stream Live')
     else:
         speech = 'No, {} is not currently streaming.'.format(PHONETIC)
@@ -84,7 +81,7 @@ def lambda_handler(event, context):
         logger.info(event)
         intent = event['request']['intent']['name']
         if intent == 'Streaming':
-            return check_live(event)
+            return check_live()
         else:
             raise ValueError('Unknown Intent')
     except Exception as error:
