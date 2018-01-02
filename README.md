@@ -12,11 +12,11 @@ Enable and ask SmAsHeD926 if he is streaming.
 
 ### Short Skill Description
 
-Get information about SmAsHeD926
+SmAsHeD926 Stream Status and Information
 
 ### Full Skill Description
 
-Easily get information about SmAsHeD926 from Alexa.
+Get details about SmAsHeD926 including stream status, followers, and more.
 
 ### Phrases
 
@@ -26,4 +26,4 @@ Easily get information about SmAsHeD926 from Alexa.
 
 ### Keywords
 
-Alexa,Discord,Discord,alexa-smashed
+SmAsHeD926,Twitch,alexa-smashed
