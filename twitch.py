@@ -21,6 +21,9 @@ class Twitch(object):
         self.name = ''
         self.display_name = ''
 
+    def __repr__(self):
+        return 'Twitch API class version: {}'.format(self.version)
+
     def is_live(self):
         self._get_stream()
         return True if self.stream else False
