@@ -1,6 +1,8 @@
+import os
+
 
 class Settings(object):
-    def __init__(self):
-        self.user_id = 22193985
-        self.channel = 'smashed926'
-        self.phonetic = 'smashed nine two six'
+    phonetic_name = os.environ.get('phonetic_name')
+    user_id = os.environ.get('user_id')
+    client_id = os.environ.get('client_id')
+    log_level = 'DEBUG'

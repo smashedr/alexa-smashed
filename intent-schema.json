@@ -1,10 +1,42 @@
 {
-  "intents": [
-    {
-      "intent": "Streaming"
-    },
-    {
-      "intent": "Followers"
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "little spanker",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "Streaming",
+          "slots": [],
+          "samples": [
+            "if he is streaming",
+            "if he is streaming now",
+            "if he is currently streaming",
+            "if he is is live"
+          ]
+        },
+        {
+          "name": "Followers",
+          "slots": [],
+          "samples": [
+            "how many followers he has",
+            "how many current followers",
+            "how many total follows",
+            "for the total number of followers",
+            "for total follows",
+            "for his total follows",
+            "how many followers",
+            "for current followers"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
+      ],
+      "types": []
     }
-  ]
+  }
 }

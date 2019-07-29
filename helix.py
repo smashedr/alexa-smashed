@@ -1,25 +1,24 @@
 from datetime import datetime
-import os
 import logging
 import requests
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger = logging.getLogger('app')
 
 
 class Twitch(object):
-    def __init__(self, user_id):
-        self.version = 'helix'
+    version = 'helix'
+    base_url = 'https://api.twitch.tv/helix'
+
+    def __init__(self, user_id, client_id):
         self.user_id = user_id
-        self.client_id = os.environ.get('client_id')
-        self.base_url = 'https://api.twitch.tv/helix'
-        self.headers = {'Client-ID': self.client_id}
-        self.channel = {}
-        self.stream = {}
+        self.client_id = client_id
+        self.login = None
+        self.display_name = None
         self.user = {}
+        self.stream = {}
         self.followers = {}
-        self.name = ''
-        self.display_name = ''
+        self.channel = {}
+        self.headers = {'Client-ID': self.client_id}
 
     def __repr__(self):
         return 'Twitch API class version: {}'.format(self.version)
@@ -47,9 +46,7 @@ class Twitch(object):
         self._get_stream()
         if self.stream:
             stream_created_at = self.stream['started_at']
-            stream_created_date = datetime.strptime(
-                stream_created_at, '%Y-%m-%dT%H:%M:%SZ'
-            )
+            stream_created_date = datetime.strptime(stream_created_at, '%Y-%m-%dT%H:%M:%SZ')
             stream_uptime = datetime.utcnow() - stream_created_date
             if human:
                 return sec_to_human(stream_uptime.seconds)
@@ -73,8 +70,8 @@ class Twitch(object):
             r = requests.get(url, params=params, headers=self.headers)
             d = r.json()
             if d['data']:
-                self.stream = d['data'][0]
-                self.user = d['data'][0]['login']
+                self.user = d['data'][0]
+                self.login = d['data'][0]['login']
                 self.display_name = d['data'][0]['display_name']
 
     def _get_stream(self):

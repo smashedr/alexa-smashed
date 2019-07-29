@@ -1,4 +1,7 @@
 .idea/
 *.iml
+**/venv/
+**/__pycache__/
+*.pyc
 .coverage
-__pycache__/
+*.log

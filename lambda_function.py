@@ -1,12 +1,11 @@
 import logging
 from alexa import alexa_resp
+from helix import Twitch
 from settings import Settings
-from twitch import Twitch
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 config = Settings()
+logger = logging.getLogger('app')
+logger.setLevel(logging.getLevelName(config.log_level))
 
 
 def lambda_handler(event, context):
@@ -25,20 +24,16 @@ def lambda_handler(event, context):
 
 
 def check_followers():
-    twitch = Twitch(config.user_id)
-    speech = '{} currently has {} followers.'.format(
-        config.phonetic, twitch.get_followers()
-    )
+    twitch = Twitch(config.user_id, config.client_id)
+    speech = '{} currently has {} followers.'.format(config.phonetic_name, twitch.get_followers())
     return alexa_resp(speech, 'Total Followers')
 
 
 def check_live():
-    twitch = Twitch(config.user_id)
+    twitch = Twitch(config.user_id, config.client_id)
     if twitch.is_live():
-        speech = 'Yes {} has been streaming for {}.'.format(
-            config.phonetic, twitch.get_uptime()
-        )
+        speech = 'Yes {} has been streaming for {}.'.format(config.phonetic_name, twitch.get_uptime())
         return alexa_resp(speech, 'Stream Live')
     else:
-        speech = 'Sorry {} is not currently streaming.'.format(config.phonetic)
+        speech = 'Sorry {} is not currently streaming.'.format(config.phonetic_name)
         return alexa_resp(speech, 'Stream Offline')
