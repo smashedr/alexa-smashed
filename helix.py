@@ -1,25 +1,21 @@
 from datetime import datetime
-import os
-import logging
 import requests
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 
 class Twitch(object):
-    def __init__(self, user_id):
-        self.version = 'helix'
+    version = 'helix'
+    base_url = 'https://api.twitch.tv/helix'
+
+    def __init__(self, user_id, client_id):
         self.user_id = user_id
-        self.client_id = os.environ.get('client_id')
-        self.base_url = 'https://api.twitch.tv/helix'
-        self.headers = {'Client-ID': self.client_id}
-        self.channel = {}
-        self.stream = {}
+        self.client_id = client_id
+        self.login = None
+        self.display_name = None
         self.user = {}
+        self.stream = {}
         self.followers = {}
-        self.name = ''
-        self.display_name = ''
+        self.channel = {}
+        self.headers = {'Client-ID': self.client_id}
 
     def __repr__(self):
         return 'Twitch API class version: {}'.format(self.version)
@@ -36,6 +32,10 @@ class Twitch(object):
         self._get_stream()
         return self.stream
 
+    def get_game_name(self, game_id):
+        game = self._get_game(game_id)
+        return game['name'] if game else None
+
     def get_followers(self, only_total=True):
         self._get_followers()
         if only_total:
@@ -47,12 +47,10 @@ class Twitch(object):
         self._get_stream()
         if self.stream:
             stream_created_at = self.stream['started_at']
-            stream_created_date = datetime.strptime(
-                stream_created_at, '%Y-%m-%dT%H:%M:%SZ'
-            )
+            stream_created_date = datetime.strptime(stream_created_at, '%Y-%m-%dT%H:%M:%SZ')
             stream_uptime = datetime.utcnow() - stream_created_date
             if human:
-                return sec_to_human(stream_uptime.seconds)
+                return self.sec_to_human(stream_uptime.seconds)
             else:
                 return stream_uptime.seconds
         else:
@@ -73,8 +71,8 @@ class Twitch(object):
             r = requests.get(url, params=params, headers=self.headers)
             d = r.json()
             if d['data']:
-                self.stream = d['data'][0]
-                self.user = d['data'][0]['login']
+                self.user = d['data'][0]
+                self.login = d['data'][0]['login']
                 self.display_name = d['data'][0]['display_name']
 
     def _get_stream(self):
@@ -85,19 +83,26 @@ class Twitch(object):
             d = r.json()
             self.stream = d['data'][0] if d['data'] else None
 
+    def _get_game(self, game_id):
+        # params['id'] = game_id if game_id else params['name'] = game_name
+        params = {'id': game_id}
+        url = '{}/games'.format(self.base_url)
+        r = requests.get(url, params=params, headers=self.headers)
+        d = r.json()
+        return d['data'][0] if d['data'] else None
 
-def sec_to_human(seconds):
-    try:
-        m, s = divmod(seconds, 60)
-        h, m = divmod(m, 60)
-        if h < 1:
-            ms = 's' if m > 1 else ''
-            o = '{} minute{}'.format(m, ms)
-        else:
-            hs = 's' if h > 1 else ''
-            ms = 's' if m > 1 else ''
-            o = '{} hour{} and {} minute{}'.format(h, hs, m, ms)
-        return o
-    except Exception as error:
-        logger.exception(error)
-        return None
+    @staticmethod
+    def sec_to_human(seconds):
+        try:
+            m, s = divmod(seconds, 60)
+            h, m = divmod(m, 60)
+            if h < 1:
+                ms = 's' if m > 1 else ''
+                o = '{} minute{}'.format(m, ms)
+            else:
+                hs = 's' if h > 1 else ''
+                ms = 's' if m > 1 else ''
+                o = '{} hour{} and {} minute{}'.format(h, hs, m, ms)
+            return o
+        except Exception:
+            return None

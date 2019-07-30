@@ -1,10 +1,40 @@
 {
-  "intents": [
-    {
-      "intent": "Streaming"
-    },
-    {
-      "intent": "Followers"
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "ben forty two",
+      "intents": [
+        {
+          "name": "check_live",
+          "slots": [],
+          "samples": [
+            "if he's is live",
+            "if he is streaming",
+            "if he is currently streaming"
+          ]
+        },
+        {
+          "name": "check_followers",
+          "slots": [],
+          "samples": [
+            "how many followers",
+            "how many total follows",
+            "how many followers he has",
+            "how many current followers",
+            "for total followers",
+            "for his total followers",
+            "for the total number of followers"
+          ]
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        }
+      ],
+      "types": []
     }
-  ]
+  }
 }
