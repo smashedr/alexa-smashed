@@ -1,8 +1,5 @@
 from datetime import datetime
-import logging
 import requests
-
-logger = logging.getLogger('app')
 
 
 class Twitch(object):
@@ -49,7 +46,7 @@ class Twitch(object):
             stream_created_date = datetime.strptime(stream_created_at, '%Y-%m-%dT%H:%M:%SZ')
             stream_uptime = datetime.utcnow() - stream_created_date
             if human:
-                return sec_to_human(stream_uptime.seconds)
+                return self.sec_to_human(stream_uptime.seconds)
             else:
                 return stream_uptime.seconds
         else:
@@ -82,19 +79,18 @@ class Twitch(object):
             d = r.json()
             self.stream = d['data'][0] if d['data'] else None
 
-
-def sec_to_human(seconds):
-    try:
-        m, s = divmod(seconds, 60)
-        h, m = divmod(m, 60)
-        if h < 1:
-            ms = 's' if m > 1 else ''
-            o = '{} minute{}'.format(m, ms)
-        else:
-            hs = 's' if h > 1 else ''
-            ms = 's' if m > 1 else ''
-            o = '{} hour{} and {} minute{}'.format(h, hs, m, ms)
-        return o
-    except Exception as error:
-        logger.exception(error)
-        return None
+    @staticmethod
+    def sec_to_human(seconds):
+        try:
+            m, s = divmod(seconds, 60)
+            h, m = divmod(m, 60)
+            if h < 1:
+                ms = 's' if m > 1 else ''
+                o = '{} minute{}'.format(m, ms)
+            else:
+                hs = 's' if h > 1 else ''
+                ms = 's' if m > 1 else ''
+                o = '{} hour{} and {} minute{}'.format(h, hs, m, ms)
+            return o
+        except Exception:
+            return None
