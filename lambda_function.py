@@ -23,7 +23,12 @@ class LambdaHandler(object):
     @classmethod
     def check_live(cls):
         if cls.twitch.is_live():
-            speech = 'Yes {} has been streaming for {}.'.format(cls.phonetic_name, cls.twitch.get_uptime())
+            stream = cls.twitch.get_stream()
+            speech = 'Yes {} has been streaming {} for {}.'.format(
+                cls.phonetic_name,
+                cls.twitch.get_game_name(stream['game_id']),
+                cls.twitch.get_uptime(),
+            )
             return alexa_resp(speech, 'Stream Live')
         else:
             speech = 'Sorry {} is not currently streaming.'.format(cls.phonetic_name)

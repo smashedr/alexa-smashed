@@ -32,6 +32,10 @@ class Twitch(object):
         self._get_stream()
         return self.stream
 
+    def get_game_name(self, game_id):
+        game = self._get_game(game_id)
+        return game['name'] if game else None
+
     def get_followers(self, only_total=True):
         self._get_followers()
         if only_total:
@@ -78,6 +82,14 @@ class Twitch(object):
             r = requests.get(url, params=params, headers=self.headers)
             d = r.json()
             self.stream = d['data'][0] if d['data'] else None
+
+    def _get_game(self, game_id):
+        # params['id'] = game_id if game_id else params['name'] = game_name
+        params = {'id': game_id}
+        url = '{}/games'.format(self.base_url)
+        r = requests.get(url, params=params, headers=self.headers)
+        d = r.json()
+        return d['data'][0] if d['data'] else None
 
     @staticmethod
     def sec_to_human(seconds):
