@@ -12,17 +12,16 @@ Enable and ask SmAsHeD926 if he is streaming.
 
 ### Short Skill Description
 
-SmAsHeD926 Stream Status and Information
+SmAsHeD926 Twitch Stream, Status and Information.
 
 ### Full Skill Description
 
-Get details about SmAsHeD926 including stream status, followers, and more.
+Get details about SmAsHeD926 including stream status, followers, and much more...
 
 ### Phrases
 
 - Alexa, ask SmAsHeD926 if he is streaming
 - Alexa, ask SmAsHeD926 how many followers he has
-- Alexa, ask SmAsHeD926 when his last twitter post was
 
 ### Keywords
 
